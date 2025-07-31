@@ -26,8 +26,8 @@ const pickBanPhases = [
   { team: "B", type: "pick", count: 2 },
   { team: "A", type: "pick", count: 1 },
   { team: "A", type: "ban", count: 1 },
-  { team: "B", type: "ban", count: 1 },
   { team: "B", type: "pick", count: 1 },
+  { team: "B", type: "ban", count: 1 },
   { team: "A", type: "pick", count: 1 }
 ];
 
