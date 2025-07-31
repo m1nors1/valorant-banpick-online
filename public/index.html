@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Valorant Ban/Pick</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Valorant Ban/Pick</h1>
+  <div id="phaseInfo"></div>
+  <div id="agentGrid" class="grid"></div>
+  <div id="results">
+    <h2>Final Picks and Bans</h2>
+    <div class="team">
+      <h3>Team A</h3>
+      <p>Picks: <span id="teamAPicks"></span></p>
+      <p>Bans: <span id="teamABans"></span></p>
+    </div>
+    <div class="team">
+      <h3>Team B</h3>
+      <p>Picks: <span id="teamBPicks"></span></p>
+      <p>Bans: <span id="teamBBans"></span></p>
+    </div>
+  </div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
