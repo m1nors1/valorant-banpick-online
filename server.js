@@ -7,13 +7,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-const agentRoles = {
-  Jett: "duelist", Phoenix: "duelist", Reyna: "duelist", Raze: "duelist", Yoru: "duelist", Neon: "duelist", Iso: "duelist", Waylay: "duelist",
-  Sova: "initiator", Breach: "initiator", Skye: "initiator", Fade: "initiator", Kayo: "initiator", Gekko: "initiator", Tejo: "initiator",
-  Omen: "controller", Brimstone: "controller", Viper: "controller", Astra: "controller", Harbor: "controller",
-  Killjoy: "sentinel", Cypher: "sentinel", Sage: "sentinel", Chamber: "sentinel", Deadlock: "sentinel", Vyse: "sentinel"
-};
-
+// Define all phases (14 actions in total)
 const pickBanPhases = [
   { team: "B", type: "pick", count: 1 },
   { team: "A", type: "pick", count: 1 },
@@ -31,70 +25,60 @@ const pickBanPhases = [
   { team: "A", type: "pick", count: 1 }
 ];
 
-const getPhase = (index) => {
+// Expand to 14-phase list
+function getPhase(index) {
   let i = 0;
   for (const phase of pickBanPhases) {
     for (let j = 0; j < phase.count; j++) {
-      if (i === index) return phase;
+      if (i === index) return { team: phase.team, type: phase.type };
       i++;
     }
   }
   return null;
-};
+}
 
+// Game state
 let gameState = {
-  firstPickedRole: null,
   picked: [],
   banned: [],
   teamPicks: { A: [], B: [] },
   teamBans: { A: [], B: [] },
   phaseIndex: 0,
-  currentPhase: null
+  currentPhase: getPhase(0)
 };
 
-// Option A: Reset on server start
+// Reset handler
 function resetGameState() {
-  gameState.phaseIndex = 0;
-  gameState.picked = [];
-  gameState.banned = [];
-  gameState.teamPicks = { A: [], B: [] };
-  gameState.teamBans = { A: [], B: [] };
-  gameState.firstPickedRole = null;
-  gameState.currentPhase = getPhase(0);
+  gameState = {
+    picked: [],
+    banned: [],
+    teamPicks: { A: [], B: [] },
+    teamBans: { A: [], B: [] },
+    phaseIndex: 0,
+    currentPhase: getPhase(0)
+  };
 }
 
-resetGameState();
-
-// Option B: Reset endpoint
 app.get("/reset", (req, res) => {
   resetGameState();
   io.emit("stateUpdate", gameState);
-  res.send("Game state reset.");
+  res.send("Game reset.");
 });
 
+// Socket logic
 io.on("connection", (socket) => {
-  console.log("Client connected");
   socket.emit("stateUpdate", gameState);
 
   socket.on("selectAgent", ({ team, type, agent }) => {
-    const currentPhase = getPhase(gameState.phaseIndex);
-    gameState.currentPhase = currentPhase;
-
-    if (!currentPhase || currentPhase.team !== team || currentPhase.type !== type) return;
+    const current = getPhase(gameState.phaseIndex);
+    if (!current || current.team !== team || current.type !== type) return;
 
     const agentLower = agent.toLowerCase();
     if (gameState.picked.includes(agentLower) || gameState.banned.includes(agentLower)) return;
 
     if (type === "pick") {
-      if (gameState.phaseIndex === 1) {
-        const expectedRole = gameState.firstPickedRole;
-        if (agentRoles[agent] !== expectedRole) return;
-      }
       gameState.picked.push(agentLower);
       gameState.teamPicks[team].push(agent);
-      if (gameState.phaseIndex === 0) {
-        gameState.firstPickedRole = agentRoles[agent];
-      }
     } else {
       gameState.banned.push(agentLower);
       gameState.teamBans[team].push(agent);
@@ -104,14 +88,10 @@ io.on("connection", (socket) => {
     gameState.currentPhase = getPhase(gameState.phaseIndex);
     io.emit("stateUpdate", gameState);
   });
-
-  socket.on("disconnect", () => {
-    console.log("Client disconnected");
-  });
 });
 
 app.use(express.static(path.join(__dirname, "public")));
 
 server.listen(3000, () => {
-  console.log("Server running at http://localhost:3000");
+  console.log("Server running on http://localhost:3000");
 });
