@@ -79,19 +79,27 @@ function showFinalResult(teamA, teamB) {
   const modal = document.createElement("div");
   modal.className = "modal";
   modal.innerHTML = `
-    <div class="modal-content" style="max-width: 700px;">
+    <div class="modal-content" style="max-width: 1400px;">
       <h2>Draft Complete</h2>
       <div style="display: flex; justify-content: space-between; gap: 40px;">
         <div style="flex: 1;">
           <h3 style="color: #4da6ff;">Team A</h3>
-          <div class="agent-row">
-            ${teamA.map(agent => `<div class="agent-tile picked-A"><img src="images/${agent.toLowerCase()}.png" alt="${agent}" /></div>`).join("")}
+          <div class="agent-row single-row">
+            ${teamA.map(agent => `
+              <div class="agent-tile picked-A">
+                <img src="images/${agent.toLowerCase()}.png" alt="${agent}" />
+              </div>
+            `).join("")}
           </div>
         </div>
         <div style="flex: 1;">
           <h3 style="color: #ff4d4d;">Team B</h3>
-          <div class="agent-row">
-            ${teamB.map(agent => `<div class="agent-tile picked-B"><img src="images/${agent.toLowerCase()}.png" alt="${agent}" /></div>`).join("")}
+          <div class="agent-row single-row">
+            ${teamB.map(agent => `
+              <div class="agent-tile picked-B">
+                <img src="images/${agent.toLowerCase()}.png" alt="${agent}" />
+              </div>
+            `).join("")}
           </div>
         </div>
       </div>
